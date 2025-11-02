@@ -4,6 +4,10 @@ export type Entry = {
   content: string;
   dateISO: string; // YYYY-MM-DD
   mood?: string;
+
   createdAt: number;
   updatedAt: number;
+
+  startedAt: number; // ms since epoch
+  endedAt?: number; // ms since epoch (set on first save)
 };

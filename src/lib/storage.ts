@@ -1,9 +1,24 @@
 "use client";
 import type { Entry } from "@/lib/types";
+import { todayISO } from "@/lib/date";
 
 const KEY = "journal.entries.v1";
 
-function read(): Entry[] {
+// --- tiny pub/sub for useSyncExternalStore ---
+type Listener = () => void;
+const listeners = new Set<Listener>();
+function notify() {
+  for (const l of listeners) l();
+}
+function subscribe(listener: Listener) {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+// ---------------------------------------------
+
+let cache: Entry[] | null = null; // 👈 cached, stable snapshot
+
+function readRaw(): Entry[] {
   if (typeof window === "undefined") return [];
   try {
     const raw = localStorage.getItem(KEY);
@@ -13,16 +28,36 @@ function read(): Entry[] {
   }
 }
 
-function write(entries: Entry[]) {
-  localStorage.setItem(KEY, JSON.stringify(entries));
+function computeSnapshot(entries: Entry[]): Entry[] {
+  // stable, sorted clone
+  return [...entries].sort((a, b) => b.createdAt - a.createdAt);
+}
+
+function getSnapshot(): Entry[] {
+  // serve the same reference until write() updates it
+  if (cache) return cache;
+  cache = computeSnapshot(readRaw());
+  return cache;
+}
+
+function write(next: Entry[]) {
+  localStorage.setItem(KEY, JSON.stringify(next));
+  cache = computeSnapshot(next); // 👈 update cached snapshot (new ref)
+  notify(); // 👈 tell subscribers
 }
 
 export const EntryStore = {
+  // useSyncExternalStore hooks
+  subscribe,
+  getSnapshot, // 👈 use this in the page
+
+  // convenience helpers
   list(): Entry[] {
-    return read().sort((a, b) => b.createdAt - a.createdAt);
+    // keep list() too, but prefer getSnapshot() in UIs
+    return getSnapshot();
   },
   get(id: string) {
-    return read().find((e) => e.id === id);
+    return getSnapshot().find((e) => e.id === id);
   },
   create(partial: Pick<Entry, "title" | "content">) {
     const now = Date.now();
@@ -30,28 +65,30 @@ export const EntryStore = {
       id: crypto.randomUUID(),
       title: partial.title || "Today",
       content: partial.content || "",
-      dateISO: new Date().toISOString().slice(0, 10),
+      dateISO: todayISO(new Date()),
       createdAt: now,
       updatedAt: now,
+      startedAt: now,
+      endedAt: undefined,
     };
-    const all = read();
+    const all = readRaw();
     all.push(entry);
     write(all);
     return entry;
   },
   update(
     id: string,
-    patch: Partial<Pick<Entry, "title" | "content" | "mood">>
+    patch: Partial<Pick<Entry, "title" | "content" | "mood" | "endedAt">>
   ) {
-    const all = read();
+    const all = readRaw();
     const i = all.findIndex((e) => e.id === id);
     if (i === -1) return undefined;
-    const updated = { ...all[i], ...patch, updatedAt: Date.now() };
+    const updated: Entry = { ...all[i], ...patch, updatedAt: Date.now() };
     all[i] = updated;
     write(all);
     return updated;
   },
   remove(id: string) {
-    write(read().filter((e) => e.id !== id));
+    write(readRaw().filter((e) => e.id !== id));
   },
 };
