@@ -9,7 +9,7 @@ import { EntryStore } from "@/lib/storage";
 import type { Entry } from "@/lib/types";
 import { formatTodayLabel } from "@/lib/date";
 
-// 👇 stable, cached server snapshot (same reference every time)
+// stable, cached server snapshot (same reference every time)
 const EMPTY_ENTRIES: Entry[] = [];
 const getServerSnapshot = () => EMPTY_ENTRIES;
 
@@ -18,8 +18,8 @@ export default function HomePage() {
 
   const entries = useSyncExternalStore(
     EntryStore.subscribe,
-    () => EntryStore.list(), // client snapshot
-    getServerSnapshot // server snapshot (stable ref)
+    () => EntryStore.list(),
+    getServerSnapshot
   ) as Entry[];
 
   const createNew = () => {
