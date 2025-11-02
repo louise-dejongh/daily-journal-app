@@ -18,7 +18,6 @@ type Props = {
 export default function EntryForm({ id, onSaved, onDeleted }: Props) {
   const existing = useMemo(() => (id ? EntryStore.get(id) : undefined), [id]);
 
-  // Avoid SSR mismatch for title/content; hydrate after mount
   const [title, setTitle] = useState(existing?.title ?? "");
   const [content, setContent] = useState(existing?.content ?? "");
 
@@ -56,7 +55,6 @@ export default function EntryForm({ id, onSaved, onDeleted }: Props) {
       }
 
       if (saved) {
-        // reflect latest times immediately in the UI
         setStartedAt(saved.startedAt);
         setEndedAt(saved.endedAt);
 
