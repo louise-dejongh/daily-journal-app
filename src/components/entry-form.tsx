@@ -103,7 +103,7 @@ export default function EntryForm({ id, onSaved, onDeleted }: Props) {
       </div>
 
       <Textarea
-        className="min-h-[240px]"
+        className="min-h-60"
         placeholder="How was your day?"
         value={content}
         onChange={(e) => setContent(e.target.value)}
