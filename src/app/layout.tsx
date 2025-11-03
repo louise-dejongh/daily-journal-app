@@ -17,10 +17,8 @@ export default function RootLayout({
       <body className="min-h-screen bg-background text-foreground">
         <header className="border-b bg-background/50 backdrop-blur">
           <div className="mx-auto max-w-3xl px-4 py-3 flex items-center justify-between">
-            <h1 className="text-xl font-semibold tracking-tight">
-              Daily Journal
-            </h1>
-            <span className="text-sm text-muted-foreground">Frontend MVP</span>
+            <h1 className="text-xl font-semibold tracking-tight">Reflect</h1>
+            <span className="text-sm text-muted-foreground">Profile</span>
           </div>
         </header>
         <main className="mx-auto max-w-3xl px-4 py-6">{children}</main>
