@@ -88,9 +88,9 @@ export default function EntryForm({ id, onSaved, onDeleted }: Props) {
 
       <div className="text-xs text-muted-foreground">
         {startedAtText && (
-          <>
+          <div>
             Started at <span className="font-medium">{startedAtText}</span>
-          </>
+          </div>
         )}
         {finishedAtText && (
           <>
