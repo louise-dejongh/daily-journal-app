@@ -8,6 +8,7 @@ import { EntryCard } from "@/components/entry-card";
 import { EntryStore } from "@/lib/storage";
 import type { Entry } from "@/lib/types";
 import { formatTodayLabel } from "@/lib/date";
+import { WeeklyCalendar } from "@/components/weekly-calendar";
 
 // stable, cached server snapshot (same reference every time)
 const EMPTY_ENTRIES: Entry[] = [];
@@ -30,8 +31,12 @@ export default function HomePage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-semibold">My Journal</h2>
+        <h2 className="text-2xl font-semibold">Good morning!</h2>
         <Button onClick={createNew}>New Entry</Button>
+      </div>
+
+      <div>
+        <WeeklyCalendar />
       </div>
 
       {entries.length === 0 ? (
