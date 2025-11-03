@@ -1,21 +1,29 @@
+// src/app/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { EntryCard } from "@/components/entry-card";
 import { EntryStore } from "@/lib/storage";
 import type { Entry } from "@/lib/types";
+import { formatTodayLabel } from "@/lib/date";
+
+// stable, cached server snapshot (same reference every time)
+const EMPTY_ENTRIES: Entry[] = [];
+const getServerSnapshot = () => EMPTY_ENTRIES;
 
 export default function HomePage() {
   const router = useRouter();
 
-  // Lazy initializer reads once on first render; no effect needed.
-  const [entries, setEntries] = useState<Entry[]>(() => EntryStore.list());
+  const entries = useSyncExternalStore(
+    EntryStore.subscribe,
+    () => EntryStore.list(),
+    getServerSnapshot
+  ) as Entry[];
 
   const createNew = () => {
-    const e = EntryStore.create({ title: "Today", content: "" });
-    setEntries(EntryStore.list());
+    const e = EntryStore.create({ title: formatTodayLabel(), content: "" });
     router.push(`/entry/${e.id}`);
   };
 
