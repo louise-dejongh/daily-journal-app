@@ -25,7 +25,7 @@ export default function RootLayout({
       <body className="min-h-screen bg-background text-foreground">
         <header className="border-b bg-background/50 backdrop-blur">
           <div className="mx-auto max-w-3xl px-4 py-3 flex items-center justify-between">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
               <Image
                 className="w-10 h-10 rounded-sm"
                 src="/images/reflect-logo.png"
