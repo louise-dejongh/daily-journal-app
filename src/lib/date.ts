@@ -26,3 +26,29 @@ export function formatTimeHM(d = new Date()) {
 export function todayISO(d = new Date()) {
   return d.toISOString().slice(0, 10);
 }
+
+// Format entry title based on date
+// - Today: "Today (Sunday, 2 November 2025)"
+// - Yesterday: "Yesterday (Saturday, 1 November 2025)"
+// - Older: "Friday, 30 October 2025"
+export function formatEntryDate(dateISO: string) {
+  const entryDate = new Date(dateISO + "T00:00:00");
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  const entryDateNormalized = new Date(entryDate);
+  entryDateNormalized.setHours(0, 0, 0, 0);
+
+  const longFormat = formatDateLong(entryDate);
+
+  if (entryDateNormalized.getTime() === today.getTime()) {
+    return `Today (${longFormat})`;
+  } else if (entryDateNormalized.getTime() === yesterday.getTime()) {
+    return `Yesterday (${longFormat})`;
+  } else {
+    return longFormat;
+  }
+}
