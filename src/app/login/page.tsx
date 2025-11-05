@@ -6,6 +6,7 @@ import { useAuthActions } from "@convex-dev/auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import Link from "next/link";
 
 const DEFAULT_REDIRECT_PATH = "/";
 
@@ -34,8 +35,6 @@ export default function SignInPage() {
   const [password, setPassword] = useState<string>("");
 
   const [busySignIn, setBusySignIn] = useState<boolean>(false);
-  const [busySignUp, setBusySignUp] = useState<boolean>(false);
-  // const [busyGoogle, setBusyGoogle] = useState<boolean>(false);
 
   async function onPasswordSignIn(
     e: React.FormEvent<HTMLFormElement>
@@ -50,19 +49,6 @@ export default function SignInPage() {
       toast.error(getErrorMessage(error, "Sign-in failed"));
     } finally {
       setBusySignIn(false);
-    }
-  }
-
-  async function onPasswordSignUp(): Promise<void> {
-    setBusySignUp(true);
-    try {
-      await signIn("password", { email, password, flow: "signUp" });
-      toast.success("Account created");
-      router.replace(redirectTo);
-    } catch (error) {
-      toast.error(getErrorMessage(error, "Sign-up failed"));
-    } finally {
-      setBusySignUp(false);
     }
   }
 
@@ -84,7 +70,7 @@ export default function SignInPage() {
       <div>
         <h1 className="text-2xl font-semibold">Sign in</h1>
         <p className="text-sm text-muted-foreground">
-          Use your email & password or continue with Google.
+          Enter your email and password to sign in
         </p>
       </div>
 
@@ -105,27 +91,24 @@ export default function SignInPage() {
           autoComplete="current-password"
           required
         />
-        <div className="flex gap-2">
-          <Button type="submit" disabled={busySignIn}>
-            {busySignIn ? "Signing in..." : "Sign in"}
-          </Button>
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={onPasswordSignUp}
-            disabled={busySignUp}
-          >
-            {busySignUp ? "Creating..." : "Create account"}
-          </Button>
-        </div>
+        <Button type="submit" disabled={busySignIn} className="w-full">
+          {busySignIn ? "Signing in..." : "Sign in"}
+        </Button>
       </form>
+
+      <div className="text-center text-sm text-muted-foreground">
+        Don&apos;t have an account?{" "}
+        <Link href="/signup" className="text-primary hover:underline">
+          Create account
+        </Link>
+      </div>
 
       {/* Uncomment when Google OAuth is configured in .env.local */}
       {/* <div className="pt-2">
         <Button
           variant="outline"
           onClick={onGoogle}
-          disabled={busyGoogle || busySignIn || busySignUp}
+          disabled={busyGoogle || busySignIn}
         >
           {busyGoogle ? "Redirecting..." : "Continue with Google"}
         </Button>
